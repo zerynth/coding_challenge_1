@@ -24,9 +24,9 @@ If the data are succesfully retrieved by the thread, it will segment the new str
 and use the segmented string to do some tasks.
 
 map to files:
-	circular_buf.c/.h: API and definitions related to the circular buffer
 
-	mutex_and_isr.c/.h: some example and sample definitions to be used to
-						demonstrate how the code works.
+	circular_buf.c/.h: API and definitions related to the circular buffer
+	
+	mutex_and_isr.c/.h: some example and sample definitions to be used to demonstrate how the code works.
 
 	main.c: ISR and thread definition and example of the code at work.
