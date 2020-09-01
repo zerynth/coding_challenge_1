@@ -238,8 +238,7 @@ void* my_malloc(mem_block *first_block, size_t size)
 void my_free(mem_block* block)
 {
 	mem_block* block_to_free = block;
-	// to move to the header of the block
-	--block_to_free;
+
 	block_to_free->is_free = true;
 }
 
