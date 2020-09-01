@@ -1,0 +1,58 @@
+# Nasal demons
+
+Each of the following snippets of C code is wrong in some way. Fix it and explain why:
+
+## One
+```
+    #define MIN(a,b) (a < b) ? (a) : (b)
+```
+Correction : To define a macro that uses arguments, you need to insert parameters between the pair of parentheses in the macro definition that make the macro function-like.
+```
+    #define MIN(a,b) (((a) < (b)) ? (a) : (b))
+```
+
+## Two
+```
+    int xto3(volatile int *x){
+        return *x * *x * *x;
+    }
+```
+Correction : The pointeur x is a type int volatile and in case of volatile the *x can make many other values and we can't get in our case (*x power 3) but we will get another thing (*x * *x1 * *x2)
+```
+    int xto3(volatile int *x){
+		int y = *x;
+        return y * y * y;
+    }
+```
+
+## Three
+
+```
+    int *align_to_bits(int *addr, int bits){
+        return ((uintptr_t)addr) & (uintptr_t)((1<<bits)-1);
+    }
+```
+Correction : the objectif of this functions is to set the "bits" bit right of the "addr" to zero for that in the actual implementation this will never happen we need to add ~ to (1<<bits -1).
+            Exmpale: bits = 3, addr = 0xABCF, the expected result is addr = 0xABC8 but here will get 0x7 because (1<<bits - 1) = 0111 = 0x0007 and 0xABCF & 0x0007= 0xABC7 for that we need to add ~(0x0007) = 0xFFF8
+```
+    int *align_to_bits(int *addr, int bits){
+        return ((uintptr_t)addr) & (uintptr_t)(~((1<<bits)-1));
+    }
+```
+
+## Four
+```
+    int return0(int a, int *b) {
+        *b=0;
+        *a=42;
+        return *b;
+    }
+```
+Correction : (*a=42) is invalid type argument of unary
+```
+    int return0(int *a, int *b) {
+        *b=0;
+        *a=42;
+        return *b;
+    }
+```
