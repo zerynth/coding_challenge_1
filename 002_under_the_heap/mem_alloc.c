@@ -261,6 +261,10 @@ int main()
 	char* my_str3 = (char*)my_malloc(free_block, 4);
 	strncpy(my_str3, "!!!", 4);
 	printf("%s%s%s", my_str1, my_str2, my_str3);
-
+	
+	// free the memory, we ned --ptr to point to the header
+	my_free((mem_block*)--my_str1);
+	my_free((mem_block*)--my_str2);
+	my_free((mem_block*)--my_str2);
 }
 
