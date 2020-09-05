@@ -11,7 +11,7 @@ project(ma-test)
 #
 # Configuration macros
 #
-add_definitions(-DHT_NODES_MAX=256)
+add_definitions(-DHT_NODES_MAX=254)
 add_definitions(-DHT_VALUE_SIZE_MAX=32)
 
 #
@@ -34,4 +34,4 @@ include_directories(
     )
 
 # Executable
-add_executable(ht-test ${C_SOURCES})
+add_executable(test ${C_SOURCES})
