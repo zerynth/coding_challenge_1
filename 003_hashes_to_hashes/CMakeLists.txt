@@ -1,0 +1,37 @@
+#
+# Set version
+#
+cmake_minimum_required(VERSION 3.0)
+
+#
+# Project Name
+#
+project(ma-test)
+
+#
+# Configuration macros
+#
+add_definitions(-DHT_NODES_MAX=256)
+add_definitions(-DHT_VALUE_SIZE_MAX=32)
+
+#
+# Paths
+#
+set(INC_PATH include)
+set(SRC_PATH src)
+
+#
+# Source Files
+#
+set(C_SOURCES
+    ${SRC_PATH}/hash_table.c
+    ${SRC_PATH}/hash_table_test_main.c
+    )
+
+# Includes
+include_directories(
+    ${INC_PATH}
+    )
+
+# Executable
+add_executable(ht-test ${C_SOURCES})
