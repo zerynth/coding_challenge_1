@@ -53,7 +53,7 @@ extern "C" {
 #endif
 
 /**
- * @macro HASH_TABLE_TRIM_VALUE_LENGTH
+ * @macro HT_TRIM_VALUE_LEN
  * @brief This macro is used to decide what to do when value string length
  * provided during @ref ht_insert is longer then maximum allowed
  * @ref HT_VALUE_SIZE_MAX .
@@ -62,8 +62,8 @@ extern "C" {
  * - Non 0 value for this macro means function will trim the value string to the
  * maximum allowed size.
  */
-#ifndef HASH_TABLE_TRIM_VALUE_LENGTH
-#define HASH_TABLE_TRIM_VALUE_LENGTH ( 0 )
+#ifndef HT_TRIM_VALUE_LEN
+#define HT_TRIM_VALUE_LEN ( 1 )
 #endif
 
 // --------------------------------------------------------- TYPE CONFIGURATION
@@ -83,8 +83,6 @@ typedef uint32_t    hash_t;
  * to store @ref HT_NODES_MAX + 1.
  * @warning Use only unsigned integer types.
  *
- * The wider type (over int size) means slower searhing of the table. Have
- * impact only in case of very big tables (probably not the case for embedded).
  */
 typedef uint16_t    ht_size_t;
 
@@ -183,6 +181,14 @@ ht_retreive( ht_ctx_t * ctx, char * key );
 
 #if ( HT_DEBUG == 1 )
 
+/**
+ * @brief Retreive value from the table based on key.
+ *
+ * @param ctx Pointer to hash table context.
+ * @param key Key string.
+ * @return char* Pointer to Value string.
+ * @warning Parameters key must be valid 0 terminated strings.
+ */
 void
 ht_print( ht_ctx_t * ctx );
 

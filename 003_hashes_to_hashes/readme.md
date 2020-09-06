@@ -7,10 +7,10 @@ functions to retrieve, insert and delete. Try to optimize for space.
 
 ## Instructions
 
-- Compile demo - `make compile`
-- Run demo - `make run`
-- Clean - `make clean`
+1. Edit `CMakeLists.txt` to adjust the pre-compile macros. More details about
+each macro can be found in `hash_table.h`.
+2. Compile demo - `make compile`
+3. Run demo - `make run`
+4. Clean - `make clean`
 
----
-
-- Cmake is necessary - `sudo apt-get install cmake`
+**Note:** Cmake is necessary.

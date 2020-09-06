@@ -111,7 +111,7 @@ ht_insert( ht_ctx_t * ctx,  char * key, char * val )
 
         if ( strlen( val ) > HT_VALUE_SIZE_MAX )
         {
-#if ( HASH_TABLE_TRIM_VALUE_LENGTH == 1 )
+#if ( HT_TRIM_VALUE_LEN == 1 )
 
             memcpy( ctx->node[ctx->used].value, val, HT_VALUE_SIZE_MAX );
 #else
@@ -121,6 +121,7 @@ ht_insert( ht_ctx_t * ctx,  char * key, char * val )
         }
         else
         {
+            memset( ctx->node[ctx->used].value, 0, HT_VALUE_SIZE_MAX + 1 );
             strcpy( ctx->node[ctx->used].value, val );
         }
 
@@ -234,7 +235,7 @@ get_node_idx( ht_ctx_t * ctx, hash_t hash )
 {
     ht_size_t idx;
 
-    //  Loop until last index in the table.
+    //  Loop until last used index in the table.
 
     for ( idx = 0; idx < ctx->used; ++idx )
     {
