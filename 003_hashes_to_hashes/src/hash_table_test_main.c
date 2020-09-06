@@ -40,39 +40,50 @@ int main( int argc, char ** argv )
 {
     printf( "Hash Table Test\r\n\r\n" );
 
-    //  Testing table 1
+    //  Testing table 1 with default hasher.
 
     ht_initialize( &table_1, NULL );
-    ht_insert( &table_1, "user 1", "Miki Manojlovic" );
-    ht_insert( &table_1, "user 2", "Paja Jovanovic" );
-    ht_insert( &table_1, "user 3", "Petar Bozovic" );
-    ht_insert( &table_1, "user 4", "Grof Drakula - Zamak u Transilvaniji "
-                         "daleko u sumi gore" );
-    ht_insert( &table_1, "user 3", "Petar Bozovic 2" );
-    ht_insert( &table_1, "user 5", "Bata Zivotinja" );
+    ht_insert( &table_1, "word1", "ALO" );
+    ht_insert( &table_1, "word2", "AOL" );
+    ht_insert( &table_1, "word3", "OLA" );
+    ht_insert( &table_1, "word4", "Popocatepetl" "Mexico" "Sombrero" "Tequila" );
+    ht_insert( &table_1, "word5", "hi" );
+    ht_insert( &table_1, "word6", "ih" );
     ht_print( &table_1 );
-    ht_delete( &table_1, "user 1" );
-    ht_delete( &table_1, "user 2" );
-    printf( "User 3 : %s\r\n", ht_retreive( &table_1, "user 3" ) );
-    printf( "User 5 : %s", ht_retreive( &table_1, "user 5" ) );
+
+    ht_insert( &table_1, "word2", "aol" );
+    ht_insert( &table_1, "word3", "ola" );
+    ht_delete( &table_1, "word4" );
+    ht_delete( &table_1, "word5" );
     ht_print( &table_1 );
+
+    printf( "\r\n\r\n" );
+    printf( "Word 1 is : %s\r\n", ht_retreive( &table_1, "word1" ) );
+    printf( "Word 4 is : %s\r\n", ht_retreive( &table_1, "word4" ) );
+    printf( "Word 6 is : %s\r\n", ht_retreive( &table_1, "word6" ) );
 
     //  Testing table 2 with custom hasher.
 
     ht_initialize( &table_2, custom_hash_calculator );
-    ht_insert( &table_2, "user 1", "Miki Manojlovic" );
-    ht_insert( &table_2, "user 2", "Paja Jovanovic" );
-    ht_insert( &table_2, "user 3", "Petar Bozovic" );
-    ht_insert( &table_2, "user 4", "Grof Drakula - Zamak u Transilvaniji "
-                         "daleko u sumi gore" );
-    ht_insert( &table_2, "user 3", "Petar Bozovic 2" );
-    ht_insert( &table_2, "user 5", "Bata Zivotinja" );
+    ht_insert( &table_2, "word1", "ALO" );
+    ht_insert( &table_2, "word2", "AOL" );
+    ht_insert( &table_2, "word3", "OLA" );
+    ht_insert( &table_2, "word4", "Popocatepetl" "Mexico" "Sombrero" "Tequila" );
+    ht_insert( &table_2, "word5", "hi" );
+    ht_insert( &table_2, "word6", "ih" );
     ht_print( &table_2 );
-    ht_delete( &table_2, "user 1" );
-    ht_delete( &table_2, "user 2" );
-    printf( "User 3 : %s\r\n", ht_retreive( &table_2, "user 3" ) );
-    printf( "User 5 : %s\r\n", ht_retreive( &table_2, "user 5" ) );
+
+    ht_insert( &table_2, "word2", "aol" );
+    ht_insert( &table_2, "word3", "ola" );
+    ht_delete( &table_2, "word4" );
+    ht_delete( &table_2, "word5" );
     ht_print( &table_2 );
+
+    printf( "\r\n\r\n" );
+    printf( "Word 1 is : %s\r\n", ht_retreive( &table_2, "word1" ) );
+    printf( "Word 4 is : %s\r\n", ht_retreive( &table_2, "word4" ) );
+    printf( "Word 6 is : %s\r\n", ht_retreive( &table_2, "word6" ) );
+
 
     return 0;
 }

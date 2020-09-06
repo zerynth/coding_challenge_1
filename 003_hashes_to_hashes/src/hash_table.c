@@ -30,6 +30,16 @@
 // ------------------------------------------------------ PRIVATES DECLARATIONS
 
 /**
+ * @brief Check key size and calculate hash if not 0
+ *
+ * @param ctx hash table context pointer.
+ * @param key key to hash
+ * @return hash_t hash value or 0 if key length is 0.
+ */
+static hash_t
+check_key( ht_ctx_t * ctx, char * key );
+
+/**
  * @brief Get the node idx.
  *
  * @param ctx hash table context pointer.
@@ -88,7 +98,10 @@ ht_insert( ht_ctx_t * ctx,  char * key, char * val )
     ASSERT( NULL != key );
     ASSERT( NULL != val );
 
-    hash = ctx->calc( key );
+    if ( 0 == ( hash = check_key( ctx, key ) ) )
+    {
+        return HT_ERROR_KEY_LENGTH;
+    }
 
     //  Does table already have same hash stored ?
 
@@ -141,7 +154,12 @@ ht_delete( ht_ctx_t * ctx, char * key )
     ASSERT( NULL != ctx );
     ASSERT( NULL != key );
 
-    hash = ctx->calc( key );
+    if ( 0 == ( hash = check_key( ctx, key ) ) )
+    {
+        //  Invalid key provided - nothing to delete.
+
+        return;
+    }
 
     /*
         Find the index of the hash calculated previously, but if not exists then
@@ -152,7 +170,9 @@ ht_delete( ht_ctx_t * ctx, char * key )
     {
         /*
             Overwrite the node on the particular index with node on the last
-            index, and decrement used.
+            index, and decrement used number of nodes. This helps us not to
+            search the whole table each time but also to have enough wide and
+            unique.
         */
 
         ctx->node[idx].hash = ctx->node[ctx->used - 1].hash;
@@ -171,7 +191,10 @@ ht_retreive( ht_ctx_t * ctx, char * key )
     ASSERT( NULL != ctx );
     ASSERT( NULL != key );
 
-    hash = ctx->calc( key );
+    if ( 0 == ( hash = check_key( ctx, key ) ) )
+    {
+        return NULL;
+    }
 
     /*
         Find the index of the hash calculated previously, but if not exists then
@@ -211,6 +234,17 @@ ht_print( ht_ctx_t * ctx )
 #endif
 
 // ---------------------------------------------------- PRIVATES IMPLEMENTATION
+
+static hash_t
+check_key( ht_ctx_t * ctx, char * key )
+{
+    if ( 0 != strlen( key ) )
+    {
+        return ctx->calc( key );
+    }
+
+    return 0;
+}
 
 static hash_t
 default_hash_calculator( char * key )

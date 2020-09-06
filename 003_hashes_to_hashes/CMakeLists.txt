@@ -11,7 +11,7 @@ project(ht-test)
 #
 # Configuration macros
 #
-add_definitions(-DHT_DEBUG=0)
+add_definitions(-DHT_DEBUG=1)
 add_definitions(-DHT_NODES_MAX=254)
 add_definitions(-DHT_VALUE_SIZE_MAX=32)
 add_definitions(-DHT_TRIM_VALUE_LEN=0)

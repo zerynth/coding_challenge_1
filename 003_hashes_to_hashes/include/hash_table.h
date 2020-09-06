@@ -16,6 +16,8 @@
  * @ref HT_VALUE_SIZE_MAX macros. Approx HT_NODES_MAX * (HT_VALUE_SIZE_MAX + 5).
  *  - Hash accuracy can be adjusted with @ref hash_t.
  *  - Multiple table context are allowed.
+ *  - Optimized search depending only on number of inserted nodes, not table
+ * size.
  *
  */
 
@@ -103,7 +105,8 @@ typedef enum
     HT_OK,
     HT_ERROR_FULL,          ///< Table is full - no space for new nodes.
     HT_ERROR_HASH_EXIST,    ///< Node with particular hash already exists.
-    HT_ERROR_VALUE_LENGTH   ///< Length of the Value string above limit.
+    HT_ERROR_VALUE_LENGTH,  ///< Length of the Value string above limit.
+    HT_ERROR_KEY_LENGTH     ///< Length of the Key string is 0.
 
 } ht_result_t;
 
@@ -151,6 +154,7 @@ ht_initialize( ht_ctx_t * ctx, ht_calculate_t hasher );
  * @param val Value string.
  * @return ht_result_t @ref ht_result_t
  * @warning Parameters key and val must be valid 0 terminated strings.
+ * @warning Key may not be empty string.
  */
 ht_result_t
 ht_insert( ht_ctx_t * ctx, char * key, char * val );
@@ -161,7 +165,8 @@ ht_insert( ht_ctx_t * ctx, char * key, char * val );
  * @param ctx Pointer to hash table context.
  * @param key Key string.
  * @warning Parameters key must be valid 0 terminated strings.
- * @note If there is no particular key in the table nothing will happen.
+ * @note If there is no particular key or string with 0 length provided as key -
+ * nothing will happen.
  */
 void
 ht_delete( ht_ctx_t * ctx, char * key );
@@ -171,8 +176,9 @@ ht_delete( ht_ctx_t * ctx, char * key );
  *
  * @param ctx Pointer to hash table context.
  * @param key Key string.
- * @return char* Pointer to Value string.
+ * @return char* Pointer to Value string, or NULL pointer when node not found.
  * @warning Parameters key must be valid 0 terminated strings.
+ * @note If sting with 0 length provided as key - NULL will be returned.
  */
 char *
 ht_retreive( ht_ctx_t * ctx, char * key );
