@@ -6,3 +6,7 @@ compile:
 
 clean:
 	rm -r build
+
+run:
+	cd ./build && \
+	./test
