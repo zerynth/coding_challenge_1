@@ -15,6 +15,17 @@
 
 // ------------------------------------------------------------- PRIVATE MACROS
 
+#if ( MA_DEBUG == 1 )
+#ifdef __linux__
+#include <stdio.h>
+#define PRINTF(t,...)   printf((t),##__VA_ARGS__)
+#else
+#define PRINTF(t,...)   //  Add print through serial for your device here.
+#endif
+#else
+#define PRINTF(t,...)
+#endif
+
 #define CAST(x)     ( meta_t * )( &buf[x] )
 
 // -------------------------------------------------------------- PRIVATE TYPES
@@ -48,6 +59,7 @@ void
 mem_initialize( void )
 {
     memset( buf, 0, MEM_ALLOC_BUFFER_SIZE );
+    PRINTF( "Buffer address %x", buf );
 }
 
 void *
@@ -70,7 +82,7 @@ mem_alloc( uint16_t size )
             {
                 //  This is the last node in array.
 
-                if ( ( idx + size + sizeof( meta_t ) ) < MEM_ALLOC_BUFFER_SIZE )
+                if ( ( idx + size + sizeof( meta_t ) ) <= MEM_ALLOC_BUFFER_SIZE )
                 {
                     /*
                         Take current space for the new node and create next
@@ -97,7 +109,7 @@ mem_alloc( uint16_t size )
                     return &buf[idx + sizeof( meta_t )];
                 }
                 else
-                if ( ( idx + size ) < MEM_ALLOC_BUFFER_SIZE )
+                if ( ( idx + size ) <= MEM_ALLOC_BUFFER_SIZE )
                 {
                     /*
                         There is enough space for new node but no space for
@@ -117,7 +129,7 @@ mem_alloc( uint16_t size )
                 }
             }
             else
-            if ( ( cur->size + sizeof( meta_t ) ) < size )
+            if ( ( cur->size + sizeof( meta_t ) ) <= size )
             {
                 //  Create another block afeter taking this.
 
@@ -139,7 +151,7 @@ mem_alloc( uint16_t size )
                 return &buf[idx + sizeof( meta_t )];
             }
             else
-            if ( cur->size < size )
+            if ( cur->size <= size )
             {
                 /*
                     There is enough space for new block but no for creating
@@ -182,7 +194,7 @@ mem_free( void * ptr )
         if ( ( !cur->used ) && ( !cur->size ) )
         {
             //  This was the last node in array.
-
+            PRINTF( "Free Last" );
             return;
         }
 
@@ -202,14 +214,9 @@ mem_free( void * ptr )
 
                 if ( !prev->used )
                 {
+                    PRINTF( "Previous not used" );
                     prev->size = cur->size + sizeof( meta_t );
                 }
-
-                //  This is not necessary previous eat this one.
-
-                cur->used = 0;
-                ptr = NULL;
-                return;
             }
 
             next = CAST( jump_to_next( idx ) );
@@ -217,7 +224,7 @@ mem_free( void * ptr )
             if ( ( !next->used ) && ( !next->size ) )
             {
                 //  Next node is the last one so just set current to be last.
-
+                PRINTF( "Next is the last - set current to be last" );
                 cur->used = 0;
                 cur->size = 0;
                 ptr = NULL;
@@ -227,15 +234,16 @@ mem_free( void * ptr )
             if ( !next->used )
             {
                 //  Eat next node.
-
+                PRINTF( "Next not used" );
                 cur->used = 0;
-                cur->size = next->size + sizeof( meta_t );
+                cur->size += next->size + sizeof( meta_t );
                 ptr = NULL;
                 return;
             }
             else
             {
                 //  No option to do defragmentation.
+                PRINTF( "Cant de fragment" );
                 cur->used = 0;
                 ptr = NULL;
                 return;
@@ -249,5 +257,36 @@ mem_free( void * ptr )
         prev = cur;
     }
 }
+
+#if ( MA_DEBUG == 1 )
+
+void
+mem_print( void )
+{
+    uint16_t node;
+    uint16_t idx;
+    meta_t * cur;
+
+    PRINTF( "\r\n Node \t | Used \t | Size \t | Address ");
+
+    for ( node = 0, idx = 0; idx < MEM_ALLOC_BUFFER_SIZE; ++node )
+    {
+        cur = CAST( idx );
+
+        PRINTF( "\r\n %d \t | %d \t | %d \t | %x ", node, cur->used, cur->size, &buf[idx + sizeof( meta_t )] );
+
+        if ( ( !cur->used ) && ( !cur->size ) )
+        {
+            return;
+        }
+
+        idx = jump_to_next( idx );
+    }
+
+    PRINTF( "\r\n" );
+}
+
+
+#endif
 
 // ---------------------------------------------------------------- END OF FILE

@@ -18,25 +18,42 @@ int main( int argc, char ** argv )
 
     uint8_t * ptr_a = mem_alloc( 44 );
     uint8_t * ptr_b = mem_alloc( 254 );
-    uint8_t * ptr_c = mem_alloc( 700 );
+    uint8_t * ptr_c = mem_alloc( 698 );
     uint8_t * ptr_d = mem_alloc( 200 );
 
-    printf( "\r\nA : %08x", ptr_a );
-    printf( "\r\nB : %08x", ptr_b );
-    printf( "\r\nC : %08x", ptr_c );
-    printf( "\r\nD : %08x", ptr_d );
+    printf( "\r\nA : %x", ptr_a );
+    printf( "\r\nB : %x", ptr_b );
+    printf( "\r\nC : %x", ptr_c );
+    printf( "\r\nD : %x", ptr_d );
+    mem_print( );
 
     mem_free( ptr_b );
+    mem_print( );
+    //mem_free( ptr_c );
+
+    uint16_t * ptr_e = mem_alloc( 254 );
+
+    printf( "\r\nA : %x", ptr_a );
+    printf( "\r\nB : %x", ptr_b );
+    printf( "\r\nC : %x", ptr_c );
+    printf( "\r\nD : %x", ptr_d );
+    printf( "\r\nE : %x", ptr_e );
+    mem_print( );
+
     mem_free( ptr_c );
+    mem_print( );
 
-    uint16_t ptr_e = mem_alloc( 254 );
+    uint16_t * ptr_f = mem_alloc( 254 );
+    uint16_t * ptr_g = mem_alloc( 254 );
 
-    printf( "\r\nA : %08x", ptr_a );
-    printf( "\r\nB : %08x", ptr_b );
-    printf( "\r\nC : %08x", ptr_c );
-    printf( "\r\nD : %08x", ptr_d );
-    printf( "\r\nE : %08x", ptr_e );
-
+    printf( "\r\nA : %x", ptr_a );
+    printf( "\r\nB : %x", ptr_b );
+    printf( "\r\nC : %x", ptr_c );
+    printf( "\r\nD : %x", ptr_d );
+    printf( "\r\nE : %x", ptr_e );
+    printf( "\r\nF : %x", ptr_f );
+    printf( "\r\nG : %x", ptr_g );
+    mem_print( );
 
     return 0;
 }

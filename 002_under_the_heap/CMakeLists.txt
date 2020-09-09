@@ -11,8 +11,7 @@ project(ma-test)
 #
 # Configuration macros
 #
-add_definitions(-DMEM_ALLOC_BUFFER_SIZE=1024)
-add_definitions(-DMEM_ALLOC_UNITS_MAX=64)
+add_definitions(-DMEM_ALLOC_BUFFER_SIZE=1000)
 
 #
 # Paths

@@ -29,6 +29,10 @@ extern "C" {
 
 // ------------------------------------------------------- MODULE CONFIGURATION
 
+#ifndef MA_DEBUG
+#define MA_DEBUG ( 1 )
+#endif
+
 #ifndef MEM_ALLOC_BUFFER_SIZE
 #define MEM_ALLOC_BUFFER_SIZE ( 1024 )
 #endif
