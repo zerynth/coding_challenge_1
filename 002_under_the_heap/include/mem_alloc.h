@@ -7,6 +7,13 @@
  *
  * @copyright Copyright (c) 2020 - GPLv3
  *
+ * ---
+ *
+ * Simple and light weight memory allocator with configurable static allocated
+ * memory. Main features :
+ *  - No limited number af allocated blocks
+ *  - Self defragmentation
+ *
  */
 
 #ifndef _MEM_ALLOC_H_
@@ -26,25 +33,32 @@ extern "C" {
 #define MEM_ALLOC_BUFFER_SIZE ( 1024 )
 #endif
 
-#ifndef MEM_ALLOC_UNITS_MAX
-#define MEM_ALLOC_UNITS_MAX ( 64 )
-#endif
-
 // --------------------------------------------------------- EXPORTED FUNCTIONS
 
 /**
- * @brief
- *
- * @param size
- * @return void*
+ * @brief Initialize allocator
+ * @return void
+ * @note In most cases (depending on arch) must be called prior to other
+ * functions from the library.
  */
-void *
-mem_alloc( uint32_t size );
+void
+mem_initialize( void );
 
 /**
- * @brief
+ * @brief Allocate space
  *
- * @param ptr
+ * @param size size of the space to allocate
+ * @return void* pointer to the memory location.
+ */
+void *
+mem_alloc( uint16_t size );
+
+/**
+ * @brief Free space
+ *
+ * @param ptr pointer to the begging of the previously allocated space.
+ * @warning You must provides start address of the allocated memory, if some
+ * of the address from the middle is provied memory will not be freed.
  */
 void
 mem_free( void * ptr );

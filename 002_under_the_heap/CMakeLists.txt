@@ -34,4 +34,4 @@ include_directories(
     )
 
 # Executable
-add_executable(ma-test ${C_SOURCES})
+add_executable(test ${C_SOURCES})

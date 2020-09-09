@@ -9,24 +9,245 @@
  *
  */
 
+#include <stddef.h>
+#include <string.h>
 #include "mem_alloc.h"
+
+// ------------------------------------------------------------- PRIVATE MACROS
+
+#define CAST(x)     ( meta_t * )( &buf[x] )
+
+// -------------------------------------------------------------- PRIVATE TYPES
+
+/**
+ * @struct meta_t
+ * @brief Simple meta type used as starting segment of each mem block.
+ */
+typedef struct
+{
+    uint8_t     used :1;
+    uint16_t    size :15;
+
+} meta_t;
 
 // ------------------------------------------------------------------ VARIABLES
 
-static volatile uint8_t mem_buf[MEM_ALLOC_BUFFER_SIZE];
+static volatile uint8_t buf[MEM_ALLOC_BUFFER_SIZE];
+
+// ------------------------------------------- PRIVATE FUNCTIONS IMPLEMENTATION
+
+static inline uint16_t jump_to_next( uint16_t idx )
+{
+    meta_t * tmp = CAST( idx );
+    return ( idx + sizeof( meta_t ) + tmp->size );
+}
 
 // --------------------------------------------------------- EXPORTED FUNCTIONS
 
-void *
-mem_alloc( uint32_t size )
+void
+mem_initialize( void )
 {
+    memset( buf, 0, MEM_ALLOC_BUFFER_SIZE );
+}
 
+void *
+mem_alloc( uint16_t size )
+{
+    uint16_t idx;
+
+    if ( size > 0x7FFF )
+    {
+        return NULL;
+    }
+
+    for ( idx = 0; idx < MEM_ALLOC_BUFFER_SIZE;  )
+    {
+        meta_t * cur = CAST( idx );
+
+        if ( !cur->used )
+        {
+            if ( !cur->size )
+            {
+                //  This is the last node in array.
+
+                if ( ( idx + size + sizeof( meta_t ) ) < MEM_ALLOC_BUFFER_SIZE )
+                {
+                    /*
+                        Take current space for the new node and create next
+                        node in space between current and the end of buffer.
+                    */
+
+                    meta_t * tmp;
+
+                    //  Update fields for the current.
+
+                    cur->used = 1;
+                    cur->size = size;
+
+                    /*
+                        Jump to next when created and clear it up just for the
+                        case it was previously used so it can be detected as
+                        last.
+                    */
+
+                    tmp = CAST( jump_to_next( idx ) );
+                    tmp->used = 0;
+                    tmp->size = 0;
+
+                    return &buf[idx + sizeof( meta_t )];
+                }
+                else
+                if ( ( idx + size ) < MEM_ALLOC_BUFFER_SIZE )
+                {
+                    /*
+                        There is enough space for new node but no space for
+                        creating node in between this and the end of buffer so
+                        take the rest of the space.
+                    */
+
+                    cur->used = 1;
+                    cur->size = MEM_ALLOC_BUFFER_SIZE - idx;
+                    return &buf[idx + sizeof( meta_t )];
+                }
+                else
+                {
+                    //  There is no space for another block.
+
+                    return NULL;
+                }
+            }
+            else
+            if ( ( cur->size + sizeof( meta_t ) ) < size )
+            {
+                //  Create another block afeter taking this.
+
+                meta_t * tmp;
+                uint16_t next_idx = jump_to_next( idx );
+
+                cur->used = 1;
+                cur->size = size;
+
+                /*
+                    Jump to next when created and clear it up just for the
+                    case it was previously used also set appropriate size so
+                    we can jump to next later.
+                */
+
+                tmp = CAST( jump_to_next( idx ) );
+                tmp->used = 0;
+                tmp->size = next_idx - idx - sizeof( meta_t );
+                return &buf[idx + sizeof( meta_t )];
+            }
+            else
+            if ( cur->size < size )
+            {
+                /*
+                    There is enough space for new block but no for creating
+                    another block afeter taking this so take the rest of the
+                    space between blocks.
+                */
+
+                cur->used = 1;
+                cur->size = jump_to_next( idx ) - idx - sizeof( meta_t );
+                return &buf[idx + sizeof( meta_t )];
+            }
+            else
+            {
+                //  No enough space in this block go to next.
+
+                idx = jump_to_next( idx );
+            }
+        }
+        else
+        {
+            //  Used block go to next.
+
+            idx = jump_to_next( idx );
+        }
+    }
 }
 
 void
 mem_free( void * ptr )
 {
+    uint16_t idx;
+    meta_t * cur;
+    meta_t * prev;
+    meta_t * next;
 
+    for ( idx = 0; ptr < &buf[MEM_ALLOC_BUFFER_SIZE];  )
+    {
+        cur = CAST( idx );
+
+        if ( ( !cur->used ) && ( !cur->size ) )
+        {
+            //  This was the last node in array.
+
+            return;
+        }
+
+        if ( &buf[idx + sizeof( meta_t )] == ptr )
+        {
+            /*
+                Node matched - now check the surrounding nodes and if some of
+                them is free do a little defragmentation :)
+            */
+
+            if ( idx != 0 )
+            {
+                /*
+                    Check previous only in case not 0 index (begining of the
+                    space).
+                */
+
+                if ( !prev->used )
+                {
+                    prev->size = cur->size + sizeof( meta_t );
+                }
+
+                //  This is not necessary previous eat this one.
+
+                cur->used = 0;
+                ptr = NULL;
+                return;
+            }
+
+            next = CAST( jump_to_next( idx ) );
+
+            if ( ( !next->used ) && ( !next->size ) )
+            {
+                //  Next node is the last one so just set current to be last.
+
+                cur->used = 0;
+                cur->size = 0;
+                ptr = NULL;
+                return;
+            }
+            else
+            if ( !next->used )
+            {
+                //  Eat next node.
+
+                cur->used = 0;
+                cur->size = next->size + sizeof( meta_t );
+                ptr = NULL;
+                return;
+            }
+            else
+            {
+                //  No option to do defragmentation.
+                cur->used = 0;
+                ptr = NULL;
+                return;
+            }
+        }
+        else
+        {
+            idx = jump_to_next( idx );
+        }
+
+        prev = cur;
+    }
 }
 
 // ---------------------------------------------------------------- END OF FILE
