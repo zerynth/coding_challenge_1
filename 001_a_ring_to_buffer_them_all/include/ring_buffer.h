@@ -48,7 +48,7 @@ extern "C" {
 #if ( RING_BUFFER_SINGLE_PRODUCER_CONSUMER == 0 )
 
 /**
- * @brief Set if the multile ISRs are consumer/producer of same buffer.
+ * @brief Set if the the ISRs are one of the multiple consumer/producer.
  *
  * If for example multiple ISR putting or getting data to/from the single buffer
  * context the set value 1 here - otherwise set 0.
@@ -69,7 +69,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Set if the multile threads are consumer/producer of same buffer.
+ * @brief Set if the only multile threads are consumer/producer of same buffer.
  *
  * If for example multiple threads putting or getting data to/from the single
  * buffer context the set value 1 here - otherwise set 0.
@@ -90,12 +90,12 @@ extern "C" {
 // ------------------------------------------------------- MODULE CONFIGURATION
 
 /*
-    Set note type. Only scalar types are allowed.
+    Set node type. Only scalar types are allowed.
 */
 #define rb_node_t           uint8_t
 
 /*
-    Set size type. Only unsigned types are allowed here. IN general use as more
+    Set size type. Only unsigned types are allowed here. In general use as more
     narrow type as possible to store the size of the buffer.
 */
 #define rb_size_t           uint32_t
