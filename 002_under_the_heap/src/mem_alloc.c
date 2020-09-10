@@ -72,6 +72,11 @@ mem_alloc( uint16_t size )
         return NULL;
     }
 
+    /*
+        This loop search for first available space to allocate it for the new
+        memory block.
+    */
+
     for ( idx = 0; idx < MEM_ALLOC_BUFFER_SIZE;  )
     {
         meta_t * cur = CAST( idx );
@@ -187,6 +192,12 @@ mem_free( void * ptr )
     meta_t * prev;
     meta_t * next;
 
+    /*
+        This loop search for allocated block according to provided address and
+        free it. Then it check surrounding space if they can be merged to create
+        greater block of available space - kind of defragmentation.
+    */
+
     for ( idx = 0; ptr < &buf[MEM_ALLOC_BUFFER_SIZE];  )
     {
         cur = CAST( idx );
@@ -201,15 +212,14 @@ mem_free( void * ptr )
         if ( &buf[idx + sizeof( meta_t )] == ptr )
         {
             /*
-                Node matched - now check the surrounding nodes and if some of
-                them is free do a little defragmentation :)
+                Node matched - now check the surrounding nodes.
             */
 
             if ( idx != 0 )
             {
                 /*
                     Check previous only in case not 0 index (begining of the
-                    space).
+                    space) and if free then merge them.
                 */
 
                 if ( !prev->used )
@@ -224,6 +234,7 @@ mem_free( void * ptr )
             if ( ( !next->used ) && ( !next->size ) )
             {
                 //  Next node is the last one so just set current to be last.
+
                 PRINTF( "Next is the last - set current to be last" );
                 cur->used = 0;
                 cur->size = 0;
@@ -233,7 +244,8 @@ mem_free( void * ptr )
             else
             if ( !next->used )
             {
-                //  Eat next node.
+                //  Merge with next node if free.
+
                 PRINTF( "Next not used" );
                 cur->used = 0;
                 cur->size += next->size + sizeof( meta_t );
@@ -243,6 +255,7 @@ mem_free( void * ptr )
             else
             {
                 //  No option to do defragmentation.
+
                 PRINTF( "Cant de fragment" );
                 cur->used = 0;
                 ptr = NULL;
@@ -273,7 +286,8 @@ mem_print( void )
     {
         cur = CAST( idx );
 
-        PRINTF( "\r\n %d \t | %d \t | %d \t | %x ", node, cur->used, cur->size, &buf[idx + sizeof( meta_t )] );
+        PRINTF( "\r\n %d \t | %d \t | %d \t | %x ", node, cur->used, cur->size,
+                &buf[idx + sizeof( meta_t )] );
 
         if ( ( !cur->used ) && ( !cur->size ) )
         {

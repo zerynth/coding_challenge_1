@@ -9,10 +9,12 @@
  *
  * ---
  *
- * Simple and light weight memory allocator with configurable static allocated
- * memory. Main features :
+ * POC - Simple and light weight memory allocator with configurable static
+ * allocated memory. Main features :
  *  - No limited number af allocated blocks
- *  - Self defragmentation
+ *  - Self defragmentation each time memory is freed
+ *
+ * Based on idea from - https://github.com/thi-ng/tinyalloc
  *
  */
 
@@ -66,6 +68,13 @@ mem_alloc( uint16_t size );
  */
 void
 mem_free( void * ptr );
+
+#if ( MA_DEBUG == 1 )
+
+void
+mem_print( void );
+
+#endif
 
 #ifdef __cplusplus
 }
