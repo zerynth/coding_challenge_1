@@ -24,7 +24,7 @@ Each of the following snippets of C code is wrong in some way. Fix it and explai
 
 ## Four
 ```
-    int return0(int a, int *b) {
+    int return0(int *a, int *b) {
         *b=0;
         *a=42;
         return *b;
